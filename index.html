@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Learn Another Language</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    color:#222;
+}
+
+.container{
+    width:95%;
+    max-width:900px;
+    margin:auto;
+}
+
+.card{
+    background:white;
+    margin:30px auto;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+h1,h2{
+    text-align:center;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+}
+
+label{
+    display:block;
+    margin-top:18px;
+    font-weight:bold;
+}
+
+select,input{
+    width:100%;
+    padding:13px;
+    margin-top:7px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    font-size:16px;
+    background:white;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    padding:12px 18px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.startBtn{
+    width:100%;
+    margin-top:25px;
+    background:#2575fc;
+    color:white;
+    font-weight:bold;
+}
+
+.backBtn{
+    background:#eee;
+    margin-bottom:15px;
+}
+
+.testBtn{
+    background:#6a11cb;
+    color:white;
+    margin-top:10px;
+}
+
+.info{
+    background:#f1f5ff;
+    padding:12px;
+    border-radius:10px;
+    margin:15px 0;
+}
+
+.status{
+    padding:10px;
+    background:#fff7df;
+    border-radius:10px;
+    margin:10px 0;
+    font-size:14px;
+}
+
+.wordCard{
+    background:#f8f9ff;
+    margin:15px 0;
+    padding:18px;
+    border-radius:15px;
+    border-left:5px solid #2575fc;
+}
+
+.source{
+    color:#666;
+    font-size:14px;
+}
+
+.word{
+    font-size:27px;
+    font-weight:bold;
+    margin:8px 0;
+}
+
+.pronunciation{
+    color:#6a11cb;
+    font-size:17px;
+    margin:6px 0;
+}
+
+.meaning{
+    color:#333;
+    margin:8px 0;
+}
+
+.category{
+    display:inline-block;
+    background:#e8edff;
+    padding:5px 9px;
+    border-radius:8px;
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+.listenBtn{
+    background:#2575fc;
+    color:white;
+    margin-right:5px;
+}
+
+.meaningBtn{
+    background:#eee;
+}
+
+.pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    margin:20px 0;
+}
+
+.pagination button{
+    background:white;
+}
+
+.hidden{
+    display:none;
+}
+
+.small{
+    font-size:13px;
+    color:#666;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- SETUP PAGE -->
+<div class="card" id="setupPage">
+
+    <h1>🌍 Learn Another Language</h1>
+
+    <p class="subtitle">
+        Choose your language and the language you want to learn.
+    </p>
+
+    <label>Your Language</label>
+
+    <select id="nativeLanguage"></select>
+
+    <label>Language You Want To Learn</label>
+
+    <select id="learningLanguage"></select>
+
+    <button class="startBtn" onclick="startLearning()">
+        Start Learning 🚀
+    </button>
+
+</div>
+
+
+<!-- LEARNING PAGE -->
+<div class="card hidden" id="learningPage">
+
+    <button class="backBtn" onclick="goBack()">
+        ← Back
+    </button>
+
+    <h1>📚 Learn Vocabulary</h1>
+
+    <div class="info" id="languageInfo"></div>
+
+    <div class="status" id="voiceStatus">
+        Checking voice...
+    </div>
+
+    <button class="testBtn" onclick="testVoice()">
+        🔊 Test Voice
+    </button>
+
+    <input
+        type="text"
+        id="searchBox"
+        placeholder="Search a word..."
+        oninput="showWords()"
+    >
+
+    <select id="categoryFilter" onchange="showWords()">
+        <option value="all">All Categories</option>
+        <option value="basic">Basic</option>
+        <option value="people">People</option>
+        <option value="daily">Daily Life</option>
+        <option value="numbers">Numbers</option>
+        <option value="school">School</option>
+        <option value="food">Food</option>
+        <option value="travel">Travel</option>
+        <option value="feelings">Feelings</option>
+        <option value="nature">Nature</option>
+        <option value="verbs">Verbs</option>
+        <option value="advanced">Advanced</option>
+    </select>
+
+    <div id="wordList"></div>
+
+    <div class="pagination">
+        <button onclick="previousPage()">⬅ Previous</button>
+        <span id="pageInfo"></span>
+        <button onclick="nextPage()">Next ➡</button>
+    </div>
+
+    <p class="small">
+        Tip: Tap 🔊 to hear the word.
+    </p>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   100 LANGUAGES
+   ========================================================= */
+
+const languages = [
+
+    ["English","en-US"],
+    ["Hindi","hi-IN"],
+    ["Punjabi","pa-IN"],
+    ["Bengali","bn-IN"],
+    ["Marathi","mr-IN"],
+    ["Gujarati","gu-IN"],
+    ["Tamil","ta-IN"],
+    ["Telugu","te-IN"],
+    ["Kannada","kn-IN"],
+    ["Malayalam","ml-IN"],
+    ["Urdu","ur-IN"],
+    ["Assamese","as-IN"],
+    ["Odia","or-IN"],
+    ["Nepali","ne-NP"],
+    ["Sanskrit","sa-IN"],
+    ["Sindhi","sd-IN"],
+    ["Kashmiri","ks-IN"],
+    ["Konkani","kok-IN"],
+    ["Maithili","mai-IN"],
+    ["Dogri","doi-IN"],
+    ["Manipuri","mni-IN"],
+
+    ["Spanish","es-ES"],
+    ["French","fr-FR"],
+    ["German","de-DE"],
+    ["Italian","it-IT"],
+    ["Portuguese","pt-PT"],
+    ["Russian","ru-RU"],
+    ["Chinese","zh-CN"],
+    ["Japanese","ja-JP"],
+    ["Korean","ko-KR"],
+    ["Arabic","ar-SA"],
+    ["Turkish","tr-TR"],
+    ["Dutch","nl-NL"],
+    ["Greek","el-GR"],
+    ["Hebrew","he-IL"],
+    ["Persian","fa-IR"],
+    ["Polish","pl-PL"],
+    ["Ukrainian","uk-UA"],
+    ["Romanian","ro-RO"],
+    ["Hungarian","hu-HU"],
+    ["Czech","cs-CZ"],
+    ["Slovak","sk-SK"],
+    ["Bulgarian","bg-BG"],
+    ["Croatian","hr-HR"],
+    ["Serbian","sr-RS"],
+    ["Slovenian","sl-SI"],
+    ["Bosnian","bs-BA"],
+    ["Albanian","sq-AL"],
+    ["Macedonian","mk-MK"],
+    ["Lithuanian","lt-LT"],
+    ["Latvian","lv-LV"],
+    ["Estonian","et-EE"],
+    ["Finnish","fi-FI"],
+    ["Swedish","sv-SE"],
+    ["Norwegian","no-NO"],
+    ["Danish","da-DK"],
+    ["Icelandic","is-IS"],
+    ["Irish","ga-IE"],
+    ["Welsh","cy-GB"],
+    ["Catalan","ca-ES"],
+    ["Basque","eu-ES"],
+    ["Galician","gl-ES"],
+    ["Maltese","mt-MT"],
+    ["Latin","la"],
+    ["Afrikaans","af-ZA"],
+    ["Swahili","sw-KE"],
+    ["Zulu","zu-ZA"],
+    ["Xhosa","xh-ZA"],
+    ["Amharic","am-ET"],
+    ["Somali","so-SO"],
+    ["Hausa","ha-NG"],
+    ["Yoruba","yo-NG"],
+    ["Igbo","ig-NG"],
+    ["Shona","sn-ZW"],
+    ["Sesotho","st-ZA"],
+    ["Setswana","tn-ZA"],
+    ["Kinyarwanda","rw-RW"],
+    ["Malagasy","mg-MG"],
+    ["Maori","mi-NZ"],
+    ["Samoan","sm-WS"],
+    ["Tongan","to-TO"],
+    ["Fijian","fj-FJ"],
+    ["Indonesian","id-ID"],
+    ["Malay","ms-MY"],
+    ["Filipino","fil-PH"],
+    ["Vietnamese","vi-VN"],
+    ["Thai","th-TH"],
+    ["Lao","lo-LA"],
+    ["Khmer","km-KH"],
+    ["Burmese","my-MM"],
+    ["Mongolian","mn-MN"],
+    ["Kazakh","kk-KZ"],
+    ["Uzbek","uz-UZ"],
+    ["Azerbaijani","az-AZ"],
+    ["Armenian","hy-AM"],
+    ["Georgian","ka-GE"],
+    ["Belarusian","be-BY"],
+    ["Mongolian","mn-MN"],
+    ["Tajik","tg-TJ"],
+    ["Turkmen","tk-TM"],
+    ["Kyrgyz","ky-KG"],
+    ["Pashto","ps-AF"],
+    ["Dari","prs-AF"],
+    ["Luxembourgish","lb-LU"],
+    ["Esperanto","eo"],
+    ["Haitian Creole","ht-HT"],
+    ["Javanese","jv-ID"],
+    ["Sundanese","su-ID"]
+
+];
+
+
+/* Remove duplicate languages */
+const uniqueLanguages = [];
+
+languages.forEach(lang => {
+    if(!uniqueLanguages.some(x => x[0] === lang[0])){
+        uniqueLanguages.push(lang);
+    }
+});
+
+
+/* =========================================================
+   BASIC VOCABULARY
+   ========================================================= */
+
+const vocabulary = [
+
+["Hello","basic","नमस्ते","ਸਤ ਸ੍ਰੀ ਅਕਾਲ"],
+["Hi","basic","हाय","ਸਤ ਸ੍ਰੀ ਅਕਾਲ"],
+["Good morning","basic","सुप्रभात","ਸ਼ੁਭ ਸਵੇਰ"],
+["Good afternoon","basic","शुभ दोपहर","ਸ਼ੁਭ ਦੁਪਹਿਰ"],
+["Good evening","basic","शुभ संध्या","ਸ਼ੁਭ ਸ਼ਾਮ"],
+["Good night","basic","शुभ रात्रि","ਸ਼ੁਭ ਰਾਤ"],
+["Goodbye","basic","अलविदा","ਅਲਵਿਦਾ"],
+["Welcome","basic","स्वागत है","ਜੀ ਆਇਆਂ ਨੂੰ"],
+["Thank you","basic","धन्यवाद","ਧੰਨਵਾਦ"],
+["Thanks","basic","शुक्रिया","ਸ਼ੁਕਰੀਆ"],
+["Please","basic","कृपया","ਕਿਰਪਾ ਕਰਕੇ"],
+["Sorry","basic","माफ़ कीजिए","ਮਾਫ਼ ਕਰਨਾ"],
+["Excuse me","basic","माफ़ कीजिए","ਮਾਫ਼ ਕਰਨਾ"],
+["Yes","basic","हाँ","ਹਾਂ"],
+["No","basic","नहीं","ਨਹੀਂ"],
+["Maybe","basic","शायद","ਸ਼ਾਇਦ"],
+["Okay","basic","ठीक है","ਠੀਕ ਹੈ"],
+["Fine","basic","अच्छा","ਵਧੀਆ"],
+["Good","basic","अच्छा","ਚੰਗਾ"],
+["Bad","basic","बुरा","ਮਾੜਾ"],
+
+["Mother","people","माँ","ਮਾਂ"],
+["Father","people","पिता","ਪਿਤਾ"],
+["Brother","people","भाई","ਭਰਾ"],
+["Sister","people","बहन","ਭੈਣ"],
+["Son","people","बेटा","ਪੁੱਤਰ"],
+["Daughter","people","बेटी","ਧੀ"],
+["Parents","people","माता-पिता","ਮਾਤਾ-ਪਿਤਾ"],
+["Family","people","परिवार","ਪਰਿਵਾਰ"],
+["Friend","people","दोस्त","ਦੋਸਤ"],
+["Teacher","people","शिक्षक","ਅਧਿਆਪਕ"],
+["Student","people","विद्यार्थी","ਵਿਦਿਆਰਥੀ"],
+["Child","people","बच्चा","ਬੱਚਾ"],
+["Boy","people","लड़का","ਮੁੰਡਾ"],
+["Girl","people","लड़की","ਕੁੜੀ"],
+["Man","people","आदमी","ਆਦਮੀ"],
+["Woman","people","महिला","ਔਰਤ"],
+["Person","people","व्यक्ति","ਵਿਅਕਤੀ"],
+["People","people","लोग","ਲੋਕ"],
+["Baby","people","शिशु","ਬੱਚਾ"],
+["Friendship","people","दोस्ती","ਦੋਸਤੀ"],
+
+["Home","daily","घर","ਘਰ"],
+["House","daily","मकान","ਮਕਾਨ"],
+["Room","daily","कमरा","ਕਮਰਾ"],
+["Door","daily","दरवाज़ा","ਦਰਵਾਜ਼ਾ"],
+["Window","daily","खिड़की","ਖਿੜਕੀ"],
+["Table","daily","मेज़","ਮੇਜ਼"],
+["Chair","daily","कुर्सी","ਕੁਰਸੀ"],
+["Bed","daily","बिस्तर","ਬਿਸਤਰਾ"],
+["Kitchen","daily","रसोई","ਰਸੋਈ"],
+["Bathroom","daily","स्नानघर","ਇਸ਼ਨਾਨਘਰ"],
+["Water","daily","पानी","ਪਾਣੀ"],
+["Light","daily","रोशनी","ਰੌਸ਼ਨੀ"],
+["Fan","daily","पंखा","ਪੱਖਾ"],
+["Book","daily","किताब","ਕਿਤਾਬ"],
+["Pen","daily","कलम","ਕਲਮ"],
+["Bag","daily","बैग","ਬੈਗ"],
+["Phone","daily","फ़ोन","ਫ਼ੋਨ"],
+["Computer","daily","कंप्यूटर","ਕੰਪਿਊਟਰ"],
+["Money","daily","पैसा","ਪੈਸਾ"],
+["Work","daily","काम","ਕੰਮ"],
+
+["One","numbers","एक","ਇੱਕ"],
+["Two","numbers","दो","ਦੋ"],
+["Three","numbers","तीन","ਤਿੰਨ"],
+["Four","numbers","चार","ਚਾਰ"],
+["Five","numbers","पाँच","ਪੰਜ"],
+["Six","numbers","छह","ਛੇ"],
+["Seven","numbers","सात","ਸੱਤ"],
+["Eight","numbers","आठ","ਅੱਠ"],
+["Nine","numbers","नौ","ਨੌਂ"],
+["Ten","numbers","दस","ਦਸ"],
+["Eleven","numbers","ग्यारह","ਗਿਆਰਾਂ"],
+["Twelve","numbers","बारह","ਬਾਰਾਂ"],
+["Thirteen","numbers","तेरह","ਤੇਰਾਂ"],
+["Fourteen","numbers","चौदह","ਚੌਦਾਂ"],
+["Fifteen","numbers","पंद्रह","ਪੰਦਰਾਂ"],
+["Sixteen","numbers","सोलह","ਸੋਲਾਂ"],
+["Seventeen","numbers","सत्रह","ਸਤਾਰਾਂ"],
+["Eighteen","numbers","अठारह","ਅਠਾਰਾਂ"],
+["Nineteen","numbers","उन्नीस","ਉੱਨੀ"],
+["Twenty","numbers","बीस","ਵੀਹ"],
+
+["School","school","स्कूल","ਸਕੂਲ"],
+["Class","school","कक्षा","ਜਮਾਤ"],
+["Lesson","school","पाठ","ਪਾਠ"],
+["Question","school","प्रश्न","ਸਵਾਲ"],
+["Answer","school","उत्तर","ਜਵਾਬ"],
+["Exam","school","परीक्षा","ਪ੍ਰੀਖਿਆ"],
+["Test","school","परीक्षण","ਟੈਸਟ"],
+["Homework","school","गृहकार्य","ਘਰ ਦਾ ਕੰਮ"],
+["Subject","school","विषय","ਵਿਸ਼ਾ"],
+["Maths","school","गणित","ਗਣਿਤ"],
+["Science","school","विज्ञान","ਵਿਗਿਆਨ"],
+["History","school","इतिहास","ਇਤਿਹਾਸ"],
+["Geography","school","भूगोल","ਭੂਗੋਲ"],
+["Language","school","भाषा","ਭਾਸ਼ਾ"],
+["Chapter","school","अध्याय","ਅਧਿਆਇ"],
+["Page","school","पृष्ठ","ਪੰਨਾ"],
+["Notebook","school","कॉपी","ਕਾਪੀ"],
+["Library","school","पुस्तकालय","ਲਾਇਬ੍ਰੇਰੀ"],
+["Knowledge","school","ज्ञान","ਗਿਆਨ"],
+["Education","school","शिक्षा","ਸਿੱਖਿਆ"],
+
+["Food","food","भोजन","ਭੋਜਨ"],
+["Rice","food","चावल","ਚੌਲ"],
+["Bread","food","रोटी","ਰੋਟੀ"],
+["Milk","food","दूध","ਦੁੱਧ"],
+["Tea","food","चाय","ਚਾਹ"],
+["Coffee","food","कॉफी","ਕੌਫੀ"],
+["Apple","food","सेब","ਸੇਬ"],
+["Banana","food","केला","ਕੇਲਾ"],
+["Mango","food","आम","ਅੰਬ"],
+["Orange","food","संतरा","ਸੰਤਰਾ"],
+["Potato","food","आलू","ਆਲੂ"],
+["Tomato","food","टमाटर","ਟਮਾਟਰ"],
+["Vegetable","food","सब्ज़ी","ਸਬਜ਼ੀ"],
+["Fruit","food","फल","ਫਲ"],
+["Salt","food","नमक","ਨਮਕ"],
+["Sugar","food","चीनी","ਚੀਨੀ"],
+["Breakfast","food","नाश्ता","ਨਾਸ਼ਤਾ"],
+["Lunch","food","दोपहर का भोजन","ਦੁਪਹਿਰ ਦਾ ਖਾਣਾ"],
+["Dinner","food","रात का खाना","ਰਾਤ ਦਾ ਖਾਣਾ"],
+["Hungry","food","भूखा","ਭੁੱਖਾ"],
+
+["Go","verbs","जाना","ਜਾਣਾ"],
+["Come","verbs","आना","ਆਉਣਾ"],
+["Eat","verbs","खाना","ਖਾਣਾ"],
+["Drink","verbs","पीना","ਪੀਣਾ"],
+["Sleep","verbs","सोना","ਸੌਣਾ"],
+["Wake","verbs","जागना","ਜਾਗਣਾ"],
+["Sit","verbs","बैठना","ਬੈਠਣਾ"],
+["Stand","verbs","खड़ा होना","ਖੜ੍ਹਾ ਹੋਣਾ"],
+["Walk","verbs","चलना","ਤੁਰਨਾ"],
+["Run","verbs","दौड़ना","ਦੌੜਨਾ"],
+["Read","verbs","पढ़ना","ਪੜ੍ਹਨਾ"],
+["Write","verbs","लिखना","ਲਿਖਣਾ"],
+["Speak","verbs","बोलना","ਬੋਲਣਾ"],
+["Listen","verbs","सुनना","ਸੁਣਨਾ"],
+["See","verbs","देखना","ਵੇਖਣਾ"],
+["Look","verbs","देखना","ਦੇਖਣਾ"],
+["Learn","verbs","सीखना","ਸਿੱਖਣਾ"],
+["Teach","verbs","सिखाना","ਸਿਖਾਉਣਾ"],
+["Understand","verbs","समझना","ਸਮਝਣਾ"],
+["Remember","verbs","याद रखना","ਯਾਦ ਰੱਖਣਾ"],
+["Forget","verbs","भूलना","ਭੁੱਲਣਾ"],
+["Think","verbs","सोचना","ਸੋਚਣਾ"],
+["Know","verbs","जानना","ਜਾਣਨਾ"],
+["Ask","verbs","पूछना","ਪੁੱਛਣਾ"],
+["Answer","verbs","उत्तर देना","ਜਵਾਬ ਦੇਣਾ"],
+["Help","verbs","मदद करना","ਮਦਦ ਕਰਨਾ"],
+["Give","verbs","देना","ਦੇਣਾ"],
+["Take","verbs","लेना","ਲੈਣਾ"],
+["Make","verbs","बनाना","ਬਣਾਉਣਾ"],
+["Open","verbs","खोलना","ਖੋਲ੍ਹਣਾ"],
+
+["Today","daily","आज","ਅੱਜ"],
+["Tomorrow","daily","कल","ਕੱਲ੍ਹ"],
+["Yesterday","daily","कल","ਕੱਲ੍ਹ"],
+["Morning","daily","सुबह","ਸਵੇਰ"],
+["Afternoon","daily","दोपहर","ਦੁਪਹਿਰ"],
+["Evening","daily","शाम","ਸ਼ਾਮ"],
+["Night","daily","रात","ਰਾਤ"],
+["Day","daily","दिन","ਦਿਨ"],
+["Week","daily","सप्ताह","ਹਫ਼ਤਾ"],
+["Month","daily","महीना","ਮਹੀਨਾ"],
+["Year","daily","साल","ਸਾਲ"],
+["Monday","daily","सोमवार","ਸੋਮਵਾਰ"],
+["Tuesday","daily","मंगलवार","ਮੰਗਲਵਾਰ"],
+["Wednesday","daily","बुधवार","ਬੁੱਧਵਾਰ"],
+["Thursday","daily","गुरुवार","ਵੀਰਵਾਰ"],
+["Friday","daily","शुक्रवार","ਸ਼ੁੱਕਰਵਾਰ"],
+["Saturday","daily","शनिवार","ਸ਼ਨੀਵਾਰ"],
+["Sunday","daily","रविवार","ਐਤਵਾਰ"],
+["Time","daily","समय","ਸਮਾਂ"],
+["Hour","daily","घंटा","ਘੰਟਾ"],
+
+["Bus","travel","बस","ਬੱਸ"],
+["Train","travel","ट्रेन","ਰੇਲਗੱਡੀ"],
+["Car","travel","कार","ਕਾਰ"],
+["Road","travel","सड़क","ਸੜਕ"],
+["Station","travel","स्टेशन","ਸਟੇਸ਼ਨ"],
+["Airport","travel","हवाई अड्डा","ਹਵਾਈ ਅੱਡਾ"],
+["Ticket","travel","टिकट","ਟਿਕਟ"],
+["Hotel","travel","होटल","ਹੋਟਲ"],
+["City","travel","शहर","ਸ਼ਹਿਰ"],
+["Village","travel","गाँव","ਪਿੰਡ"],
+["Country","travel","देश","ਦੇਸ਼"],
+["India","travel","भारत","ਭਾਰਤ"],
+["Market","travel","बाज़ार","ਬਾਜ਼ਾਰ"],
+["Shop","travel","दुकान","ਦੁਕਾਨ"],
+["Hospital","travel","अस्पताल","ਹਸਪਤਾਲ"],
+["Temple","travel","मंदिर","ਮੰਦਰ"],
+["Park","travel","पार्क","ਪਾਰਕ"],
+["Street","travel","गली","ਗਲੀ"],
+["Left","travel","बायाँ","ਖੱਬੇ"],
+["Right","travel","दायाँ","ਸੱਜੇ"],
+
+["Happy","feelings","खुश","ਖੁਸ਼"],
+["Sad","feelings","दुखी","ਉਦਾਸ"],
+["Angry","feelings","गुस्सा","ਗੁੱਸੇ"],
+["Afraid","feelings","डरा हुआ","ਡਰਿਆ ਹੋਇਆ"],
+["Excited","feelings","उत्साहित","ਉਤਸ਼ਾਹਿਤ"],
+["Tired","feelings","थका हुआ","ਥੱਕਿਆ ਹੋਇਆ"],
+["Worried","feelings","चिंतित","ਚਿੰਤਤ"],
+["Calm","feelings","शांत","ਸ਼ਾਂਤ"],
+["Love","feelings","प्यार","ਪਿਆਰ"],
+["Hope","feelings","आशा","ਉਮੀਦ"],
+["Fear","feelings","डर","ਡਰ"],
+["Dream","feelings","सपना","ਸੁਪਨਾ"],
+["Smile","feelings","मुस्कान","ਮੁਸਕਰਾਹਟ"],
+["Laugh","feelings","हँसना","ਹੱਸਣਾ"],
+["Cry","feelings","रोना","ਰੋਣਾ"],
+["Beautiful","feelings","सुंदर","ਸੁੰਦਰ"],
+["Kind","feelings","दयालु","ਦਿਆਲੂ"],
+["Brave","feelings","बहादुर","ਬਹਾਦਰ"],
+["Strong","feelings","मज़बूत","ਮਜ਼ਬੂਤ"],
+["Important","feelings","महत्वपूर्ण","ਮਹੱਤਵਪੂਰਨ"],
+
+["Sun","nature","सूरज","ਸੂਰਜ"],
+["Moon","nature","चाँद","ਚੰਦ"],
+["Star","nature","तारा","ਤਾਰਾ"],
+["Sky","nature","आकाश","ਅਸਮਾਨ"],
+["Cloud","nature","बादल","ਬੱਦਲ"],
+["Rain","nature","बारिश","ਮੀਂਹ"],
+["Wind","nature","हवा","ਹਵਾ"],
+["River","nature","नदी","ਨਦੀ"],
+["Mountain","nature","पहाड़","ਪਹਾੜ"],
+["Tree","nature","पेड़","ਰੁੱਖ"],
+["Flower","nature","फूल","ਫੁੱਲ"],
+["Garden","nature","बगीचा","ਬਾਗ਼"],
+["Earth","nature","धरती","ਧਰਤੀ"],
+["Fire","nature","आग","ਅੱਗ"],
+["Air","nature","वायु","ਹਵਾ"],
+["Waterfall","nature","झरना","ਝਰਨਾ"],
+["Forest","nature","जंगल","ਜੰਗਲ"],
+["Animal","nature","जानवर","ਜਾਨਵਰ"],
+["Bird","nature","पक्षी","ਪੰਛੀ"],
+["Fish","nature","मछली","ਮੱਛੀ"],
+
+["Easy","advanced","आसान","ਸੌਖਾ"],
+["Difficult","advanced","कठिन","ਔਖਾ"],
+["Simple","advanced","सरल","ਸਧਾਰਨ"],
+["Possible","advanced","संभव","ਸੰਭਵ"],
+["Impossible","advanced","असंभव","ਅਸੰਭਵ"],
+["Different","advanced","अलग","ਵੱਖਰਾ"],
+["Same","advanced","समान","ਇੱਕੋ ਜਿਹਾ"],
+["Correct","advanced","सही","ਸਹੀ"],
+["Wrong","advanced","गलत","ਗਲਤ"],
+["True","advanced","सत्य","ਸੱਚ"],
+["False","advanced","झूठा","ਝੂਠਾ"],
+["Reason","advanced","कारण","ਕਾਰਨ"],
+["Problem","advanced","समस्या","ਸਮੱਸਿਆ"],
+["Solution","advanced","समाधान","ਹੱਲ"],
+["Idea","advanced","विचार","ਵਿਚਾਰ"],
+["Example","advanced","उदाहरण","ਉਦਾਹਰਨ"],
+["Experience","advanced","अनुभव","ਤਜਰਬਾ"],
+["Success","advanced","सफलता","ਸਫਲਤਾ"],
+["Failure","advanced","असफलता","ਅਸਫਲਤਾ"],
+["Future","advanced","भविष्य","ਭਵਿੱਖ"],
+["Past","advanced","अतीत","ਅਤੀਤ"],
+["Present","advanced","वर्तमान","ਵਰਤਮਾਨ"],
+["Change","advanced","बदलाव","ਤਬਦੀਲੀ"],
+["Choice","advanced","चुनाव","ਚੋਣ"],
+["Decision","advanced","निर्णय","ਫੈਸਲਾ"],
+["Opportunity","advanced","अवसर","ਮੌਕਾ"],
+["Knowledge","advanced","ज्ञान","ਗਿਆਨ"],
+["Freedom","advanced","स्वतंत्रता","ਆਜ਼ਾਦੀ"],
+["Respect","advanced","सम्मान","ਸਤਿਕਾਰ"],
+["Success","advanced","सफलता","ਕਾਮਯਾਬੀ"]
+
+];
+
+
+/* =========================================================
+   LOAD 100 LANGUAGES INTO BOTH BOXES
+   ========================================================= */
+
+function loadLanguages(){
+
+    const native = document.getElementById("nativeLanguage");
+    const learning = document.getElementById("learningLanguage");
+
+    native.innerHTML = "";
+    learning.innerHTML = "";
+
+    uniqueLanguages.forEach((lang,index)=>{
+
+        const option1 = document.createElement("option");
+        option1.value = index;
+        option1.textContent = lang[0];
+
+        const option2 = document.createElement("option");
+        option2.value = index;
+        option2.textContent = lang[0];
+
+        native.appendChild(option1);
+        learning.appendChild(option2);
+
+    });
+
+    native.value = "0";
+    learning.value = "2";
+}
+
+
+/* =========================================================
+   VARIABLES
+   ========================================================= */
+
+let nativeLanguage;
+let learningLanguage;
+let currentPage = 1;
+
+const wordsPerPage = 10;
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+function startLearning(){
+
+    nativeLanguage =
+        uniqueLanguages[
+            document.getElementById("nativeLanguage").value
+        ];
+
+    learningLanguage =
+        uniqueLanguages[
+            document.getElementById("learningLanguage").value
+        ];
+
+    document.getElementById("setupPage")
+        .classList.add("hidden");
+
+    document.getElementById("learningPage")
+        .classList.remove("hidden");
+
+    document.getElementById("languageInfo").innerHTML =
+        "<b>Your language:</b> " +
+        nativeLanguage[0] +
+        "<br><b>Learning:</b> " +
+        learningLanguage[0];
+
+    currentPage = 1;
+
+    checkVoice();
+
+    showWords();
+}
+
+
+/* =========================================================
+   BACK
+   ========================================================= */
+
+function goBack(){
+
+    document.getElementById("learningPage")
+        .classList.add("hidden");
+
+    document.getElementById("setupPage")
+        .classList.remove("hidden");
+}
+
+
+/* =========================================================
+   HINDI PRONUNCIATION
+   ========================================================= */
+
+function getHindiPronunciation(word){
+
+    /*
+       For Punjabi we show the Punjabi word itself.
+       This function gives a simple Hindi-style reading
+       for common Punjabi words.
+    */
+
+    const pronunciation = {
+
+        "ਸਤ ਸ੍ਰੀ ਅਕਾਲ":"सत श्री अकाल",
+        "ਸ਼ੁਭ ਸਵੇਰ":"शुभ सवेर",
+        "ਸ਼ੁਭ ਦੁਪਹਿਰ":"शुभ दुपहर",
+        "ਸ਼ੁਭ ਸ਼ਾਮ":"शुभ शाम",
+        "ਸ਼ੁਭ ਰਾਤ":"शुभ रात",
+        "ਧੰਨਵਾਦ":"धन्नवाद",
+        "ਸ਼ੁਕਰੀਆ":"शुक्रिया",
+        "ਕਿਰਪਾ ਕਰਕੇ":"किरपा करके",
+        "ਮਾਫ਼ ਕਰਨਾ":"माफ़ करना",
+        "ਹਾਂ":"हाँ",
+        "ਨਹੀਂ":"नहीं",
+        "ਠੀਕ ਹੈ":"ठीक है",
+        "ਮਾਂ":"माँ",
+        "ਪਿਤਾ":"पिता",
+        "ਭਰਾ":"भरा",
+        "ਭੈਣ":"भैण",
+        "ਪੁੱਤਰ":"पुत्तर",
+        "ਧੀ":"धी",
+        "ਪਰਿਵਾਰ":"परिवार",
+        "ਦੋਸਤ":"दोस्त",
+        "ਅਧਿਆਪਕ":"अध्यापक",
+        "ਵਿਦਿਆਰਥੀ":"विद्यार्थी",
+        "ਬੱਚਾ":"बच्चा",
+        "ਮੁੰਡਾ":"मुंडा",
+        "ਕੁੜੀ":"कुड़ी",
+        "ਆਦਮੀ":"आदमी",
+        "ਔਰਤ":"औरत",
+        "ਲੋਕ":"लोक",
+        "ਘਰ":"घर",
+        "ਕਮਰਾ":"कमरा",
+        "ਦਰਵਾਜ਼ਾ":"दरवाज़ा",
+        "ਖਿੜਕੀ":"खिड़की",
+        "ਮੇਜ਼":"मेज़",
+        "ਕੁਰਸੀ":"कुर्सी",
+        "ਪਾਣੀ":"पाणी",
+        "ਕਿਤਾਬ":"किताब",
+        "ਕਲਮ":"कलम",
+        "ਪੈਸਾ":"पैसा",
+        "ਇੱਕ":"इक",
+        "ਦੋ":"दो",
+        "ਤਿੰਨ":"तिन्न",
+        "ਚਾਰ":"चार",
+        "ਪੰਜ":"पंज",
+        "ਛੇ":"छे",
+        "ਸੱਤ":"सत्त",
+        "ਅੱਠ":"अट्ठ",
+        "ਨੌਂ":"नौं",
+        "ਦਸ":"दस",
+        "ਵੀਹ":"वीह",
+        "ਸਕੂਲ":"स्कूल",
+        "ਜਮਾਤ":"जमात",
+        "ਪਾਠ":"पाठ",
+        "ਸਵਾਲ":"सवाल",
+        "ਜਵਾਬ":"जवाब",
+        "ਗਣਿਤ":"गणित",
+        "ਵਿਗਿਆਨ":"विग्यान",
+        "ਇਤਿਹਾਸ":"इतिहास",
+        "ਭੂਗੋਲ":"भूगोल",
+        "ਭਾਸ਼ਾ":"भाषा",
+        "ਗਿਆਨ":"ग्यान",
+        "ਸਿੱਖਿਆ":"सिखिआ",
+        "ਭੋਜਨ":"भोजन",
+        "ਚੌਲ":"चौल",
+        "ਰੋਟੀ":"रोटी",
+        "ਦੁੱਧ":"दुध",
+        "ਚਾਹ":"चाह",
+        "ਸੇਬ":"सेब",
+        "ਕੇਲਾ":"केला",
+        "ਅੰਬ":"अंब",
+        "ਨਮਕ":"नमक",
+        "ਸਵੇਰ":"सवेर",
+        "ਦੁਪਹਿਰ":"दुपहर",
+        "ਸ਼ਾਮ":"शाम",
+        "ਰਾਤ":"रात",
+        "ਅੱਜ":"अज्ज",
+        "ਕੱਲ੍ਹ":"कल",
+        "ਸਮਾਂ":"समां",
+        "ਬੱਸ":"बस",
+        "ਰੇਲਗੱਡੀ":"रेल गड्डी",
+        "ਕਾਰ":"कार",
+        "ਸੜਕ":"सड़क",
+        "ਸਟੇਸ਼ਨ":"स्टेशन",
+        "ਟਿਕਟ":"टिकट",
+        "ਸ਼ਹਿਰ":"शहर",
+        "ਪਿੰਡ":"पिंड",
+        "ਦੇਸ਼":"देश",
+        "ਭਾਰਤ":"भारत",
+        "ਬਾਜ਼ਾਰ":"बाज़ार",
+        "ਦੁਕਾਨ":"दुकान",
+        "ਮੰਦਰ":"मंदर",
+        "ਖੱਬੇ":"खब्बे",
+        "ਸੱਜੇ":"सज्जे",
+        "ਖੁਸ਼":"खुश",
+        "ਉਦਾਸ":"उदास",
+        "ਗੁੱਸੇ":"गुस्से",
+        "ਡਰ":"डर",
+        "ਪਿਆਰ":"प्यार",
+        "ਉਮੀਦ":"उम्मीद",
+        "ਸੁਪਨਾ":"सुपना",
+        "ਮੁਸਕਰਾਹਟ":"मुस्कराहट",
+        "ਹੱਸਣਾ":"हस्सणा",
+        "ਰੋਣਾ":"रोणा",
+        "ਸੁੰਦਰ":"सुंदर",
+        "ਬਹਾਦਰ":"बहादुर",
+        "ਮਜ਼ਬੂਤ":"मज़बूत",
+        "ਸੂਰਜ":"सूरज",
+        "ਚੰਦ":"चंद",
+        "ਤਾਰਾ":"तारा",
+        "ਅਸਮਾਨ":"असमान",
+        "ਬੱਦਲ":"बद्दल",
+        "ਮੀਂਹ":"मींह",
+        "ਹਵਾ":"हवा",
+        "ਨਦੀ":"नदी",
+        "ਪਹਾੜ":"पहाड़",
+        "ਰੁੱਖ":"रुख",
+        "ਫੁੱਲ":"फुल्ल",
+        "ਬਾਗ਼":"बाग़",
+        "ਧਰਤੀ":"धरती",
+        "ਅੱਗ":"अग्ग",
+        "ਜੰਗਲ":"जंगल",
+        "ਜਾਨਵਰ":"जानवर",
+        "ਪੰਛੀ":"पंछी",
+        "ਮੱਛੀ":"मच्छी",
+        "ਸੌਖਾ":"सौखा",
+        "ਔਖਾ":"औखा",
+        "ਸਧਾਰਨ":"सधारण",
+        "ਸੰਭਵ":"संभव",
+        "ਅਸੰਭਵ":"असंभव",
+        "ਵੱਖਰਾ":"वखरा",
+        "ਸਹੀ":"सही",
+        "ਗਲਤ":"गलत",
+        "ਸੱਚ":"सच्च",
+        "ਕਾਰਨ":"कारण",
+        "ਸਮੱਸਿਆ":"समस्या",
+        "ਹੱਲ":"हल",
+        "ਵਿਚਾਰ":"विचार",
+        "ਉਦਾਹਰਨ":"उदाहरण",
+        "ਤਜਰਬਾ":"तजरबा",
+        "ਸਫਲਤਾ":"सफलता",
+        "ਭਵਿੱਖ":"भविख",
+        "ਫੈਸਲਾ":"फैसला",
+        "ਮੌਕਾ":"मौका",
+        "ਸਤਿਕਾਰ":"सतिकार",
+        "ਕਾਮਯਾਬੀ":"कामयाबी"
+
+    };
+
+    return pronunciation[word] || "";
+}
+
+
+/* =========================================================
+   GET TRANSLATION
+   ========================================================= */
+
+function getTranslation(item){
+
+    const english = item[0];
+    const hindi = item[2];
+    const punjabi = item[3];
+
+    if(learningLanguage[0] === "English"){
+        return {
+            word:english,
+            pronunciation:english
+        };
+    }
+
+    if(learningLanguage[0] === "Hindi"){
+        return {
+            word:hindi,
+            pronunciation:hindi
+        };
+    }
+
+    if(learningLanguage[0] === "Punjabi"){
+        return {
+            word:punjabi,
+            pronunciation:getHindiPronunciation(punjabi)
+        };
+    }
+
+    /*
+      Other languages are available in the language list.
+      Their translation database can be added next.
+    */
+
+    return {
+        word:english,
+        pronunciation:"Translation database coming soon"
+    };
+}
+
+
+/* =========================================================
+   GET MEANING
+   ========================================================= */
+
+function getMeaning(item){
+
+    if(nativeLanguage[0] === "Hindi"){
+        return item[2];
+    }
+
+    if(nativeLanguage[0] === "Punjabi"){
+        return item[3];
+    }
+
+    if(nativeLanguage[0] === "English"){
+        return item[0];
+    }
+
+    return item[0];
+}
+
+
+/* =========================================================
+   SHOW WORDS
+   ========================================================= */
+
+function showWords(){
+
+    const search =
+        document.getElementById("searchBox")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const category =
+        document.getElementById("categoryFilter").value;
+
+    let filtered = vocabulary.filter(item => {
+
+        const matchesSearch =
+            item[0].toLowerCase().includes(search) ||
+            item[2].toLowerCase().includes(search) ||
+            item[3].toLowerCase().includes(search);
+
+        const matchesCategory =
+            category === "all" ||
+            item[1] === category;
+
+        return matchesSearch && matchesCategory;
+
+    });
+
+
+    const totalPages =
+        Math.max(1,Math.ceil(filtered.length / wordsPerPage));
+
+    if(currentPage > totalPages){
+        currentPage = totalPages;
+    }
+
+
+    const start =
+        (currentPage - 1) * wordsPerPage;
+
+    const pageWords =
+        filtered.slice(start,start + wordsPerPage);
+
+
+    const list =
+        document.getElementById("wordList");
+
+    list.innerHTML = "";
+
+
+    if(pageWords.length === 0){
+
+        list.innerHTML =
+            "<p style='text-align:center'>No word found.</p>";
+
+        document.getElementById("pageInfo").textContent =
+            "0 / 0";
+
+        return;
+    }
+
+
+    pageWords.forEach(item => {
+
+        const translation = getTranslation(item);
+        const meaning = getMeaning(item);
+
+        const card = document.createElement("div");
+
+        card.className = "wordCard";
+
+        card.innerHTML = `
+
+            <span class="category">
+                ${escapeHTML(item[1])}
+            </span>
+
+            <div class="source">
+                English: ${escapeHTML(item[0])}
+            </div>
+
+            <div class="word">
+                ${escapeHTML(translation.word)}
+            </div>
+
+            ${
+                translation.pronunciation
+                ?
+                `<div class="pronunciation">
+                    Hindi reading:
+                    ${escapeHTML(translation.pronunciation)}
+                </div>`
+                :
+                ""
+            }
+
+            <div class="meaning">
+                Meaning:
+                ${escapeHTML(meaning)}
+            </div>
+
+            <button
+                class="listenBtn"
+                onclick='speakWord(${JSON.stringify(
+                    translation.word
+                )})'
+            >
+                🔊 Listen
+            </button>
+
+            <button
+                class="meaningBtn"
+                onclick='showMeaning(${JSON.stringify(
+                    meaning
+                )})'
+            >
+                Meaning
+            </button>
+        `;
+
+        list.appendChild(card);
+
+    });
+
+
+    document.getElementById("pageInfo").textContent =
+        currentPage + " / " + totalPages;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+function nextPage(){
+
+    currentPage++;
+
+    showWords();
+}
+
+
+function previousPage(){
+
+    if(currentPage > 1){
+        currentPage--;
+        showWords();
+    }
+
+}
+
+
+/* =========================================================
+   MEANING BUTTON
+   ========================================================= */
+
+function showMeaning(text){
+
+    alert("Meaning: " + text);
+
+}
+
+
+/* =========================================================
+   SPEECH
+   ========================================================= */
+
+let voices = [];
+
+
+function loadVoices(){
+
+    voices = speechSynthesis.getVoices();
+
+    checkVoice();
+
+}
+
+
+function findVoice(languageCode){
+
+    if(!voices.length){
+        return null;
+    }
+
+    const exact =
+        voices.find(v =>
+            v.lang.toLowerCase() ===
+            languageCode.toLowerCase()
+        );
+
+    if(exact){
+        return exact;
+    }
+
+    const shortCode =
+        languageCode.split("-")[0].toLowerCase();
+
+    return voices.find(v =>
+        v.lang.toLowerCase().startsWith(shortCode)
+    ) || null;
+}
+
+
+function speakWord(text){
+
+    if(!("speechSynthesis" in window)){
+
+        alert(
+            "Your browser does not support voice. Please open this file in Chrome."
+        );
+
+        return;
+    }
+
+
+    speechSynthesis.cancel();
+
+    const utterance =
+        new SpeechSynthesisUtterance(text);
+
+    utterance.lang =
+        learningLanguage[1];
+
+    utterance.rate = 0.8;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+
+    const voice =
+        findVoice(learningLanguage[1]);
+
+    if(voice){
+        utterance.voice = voice;
+    }
+
+
+    utterance.onstart = function(){
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "🔊 Speaking " +
+            learningLanguage[0] +
+            "...";
+
+    };
+
+
+    utterance.onend = function(){
+
+        checkVoice();
+
+    };
+
+
+    utterance.onerror = function(){
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "❌ Voice could not play. Try Chrome + Google Speech Services.";
+
+    };
+
+
+    speechSynthesis.speak(utterance);
+
+}
+
+
+/* =========================================================
+   TEST VOICE
+   ========================================================= */
+
+function testVoice(){
+
+    let testText = "Hello";
+
+    if(learningLanguage[0] === "Hindi"){
+        testText = "नमस्ते";
+    }
+
+    if(learningLanguage[0] === "Punjabi"){
+        testText = "ਸਤ ਸ੍ਰੀ ਅਕਾਲ";
+    }
+
+    speakWord(testText);
+
+}
+
+
+/* =========================================================
+   CHECK VOICE
+   ========================================================= */
+
+function checkVoice(){
+
+    if(!learningLanguage){
+        return;
+    }
+
+    if(!("speechSynthesis" in window)){
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "❌ Speech is not supported in this browser.";
+
+        return;
+    }
+
+
+    const voice =
+        findVoice(learningLanguage[1]);
+
+
+    if(voice){
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "✅ Voice available: " +
+            voice.name +
+            " (" +
+            voice.lang +
+            ")";
+
+    }else{
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "⚠️ No matching " +
+            learningLanguage[0] +
+            " voice found on this device. Chrome/Google Speech Services may be needed.";
+
+    }
+
+}
+
+
+/* =========================================================
+   SECURITY
+   ========================================================= */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+loadLanguages();
+
+if("speechSynthesis" in window){
+
+    speechSynthesis.onvoiceschanged =
+        loadVoices;
+
+    setTimeout(loadVoices,500);
+    setTimeout(loadVoices,1500);
+
+}
+
+</script>
+
+</body>
+</html>
